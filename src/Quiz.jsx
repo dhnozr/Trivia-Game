@@ -3,12 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { decode } from 'html-entities';
 
 export default function Quiz() {
   const location = useLocation();
   const categoryNumber = location?.state;
   console.log(categoryNumber);
   const id = categoryNumber;
+
+  const [userAnswers, setUserAnswers] = useState([]);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['questions'],
@@ -21,46 +24,98 @@ export default function Quiz() {
     },
   });
 
-  const questions = [];
+  const [shuffledQuestions, setShuffledQuestions] = useState([]);
+
+  useEffect(() => {
+    if (data) {
+      const shuffledData = data.map(el => ({
+        category: decode(el.category),
+        correct_answer: decode(el.correct_answer),
+        difficulty: decode(el.difficulty),
+        all_answers: shuffleArray(
+          [...el.incorrect_answers, el.correct_answer].map(answer =>
+            decode(answer)
+          )
+        ),
+        question: decode(el.question),
+      }));
+      setShuffledQuestions(shuffledData);
+    }
+  }, [data]);
+
+  /*  const questions = [];
   {
     data?.map(el => {
       questions.push({
-        category: el.category,
-        correct_answer: el.correct_answer,
-        difficulty: el.difficulty,
+        category: decode(el.category),
+        correct_answer: decode(el.correct_answer),
+        difficulty: decode(el.difficulty),
         all_answers: shuffleArray([...el.incorrect_answers, el.correct_answer]),
-        question: el.question,
+        question: decode(el.question),
       });
     });
-  }
+  } */
 
   function shuffleArray(array) {
-    let currentIndex = array.length,
-      temporaryValue,
-      randomIndex;
-
-    // While there remain elements to shuffle...
-    while (0 !== currentIndex) {
-      // Pick a remaining element...
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex -= 1;
-
-      // And swap it with the current element.
-      temporaryValue = array[currentIndex];
-      array[currentIndex] = array[randomIndex];
-      array[randomIndex] = temporaryValue;
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
     }
-
     return array;
   }
 
-  const questionsEl = questions.map((qsn, i) => (
-    <div>
-      <h2>{qsn.question}</h2>
-      <div>
+  function handleAnswers(event, questionId) {
+    const answers = [...userAnswers];
+    const isCorrect =
+      event.target.value === shuffledQuestions[questionId].correct_answer;
+    answers[questionId] = {
+      question: shuffledQuestions[questionId].question,
+      isCorrect,
+      answer: event.target.value,
+      correct_answer: shuffledQuestions[questionId].correct_answer,
+    };
+
+    console.log(event.target.value);
+
+    setUserAnswers(answers);
+  }
+
+  console.log(userAnswers);
+
+  function handleSubmit() {
+    let score = 0;
+    userAnswers.forEach((ans, index) => {
+      if (ans === shuffledQuestions[index].correct_answer) {
+        score++;
+      }
+    });
+
+    return console.log(`your score ${score}`);
+  }
+
+  const questionsEl = shuffledQuestions.map((qsn, i) => (
+    <div className="text-center flex flex-col gap-4">
+      <h2 className="text-lg font-bold mt-10 ">{qsn.question}</h2>
+      <div className="flex flex-wrap items-center justify-center gap-6">
         {qsn.all_answers.map((ans, index) => (
-          <label htmlFor={`q${i}-${index}`}>
-            <input key={index} type="radio" name={`q-${i}`} value={ans} /> {ans}
+          <label
+            className={`w-full max-w-[180px] py-2  relative border border-sky-100 rounded ${
+              userAnswers[i]?.answer === ans
+                ? 'bg-[#D6DBF5] text-[#293264]'
+                : ''
+            }`}
+            htmlFor={`q${i}a${index}`}
+          >
+            <input
+              className="w-full opacity-0 hidden"
+              onChange={e => handleAnswers(e, i)}
+              key={index}
+              type="radio"
+              name={`q${i}`}
+              value={ans}
+              id={`q${i}a${index}`}
+            />
+            {ans}
           </label>
         ))}
       </div>
@@ -69,17 +124,22 @@ export default function Quiz() {
 
   return (
     <>
-      {isLoading ? (
-        <div>
-          <h2>...Loading</h2>
-        </div>
-      ) : error ? (
-        <div>
-          <h2>Error accured : {error.message}</h2>
-        </div>
-      ) : (
-        questionsEl
-      )}
+      <div className="min-h-screen bg-[url('/layered-waves-haikei.svg')] bg-no-repeat bg-cover text-[#DEEBF8] flex flex-col font-Inter">
+        {isLoading ? (
+          <div>
+            <h2>...Loading</h2>
+          </div>
+        ) : error ? (
+          <div>
+            <h2>Error accured : {error.message}</h2>
+          </div>
+        ) : (
+          <div>
+            {questionsEl}
+            <button onClick={handleSubmit}>submit</button>
+          </div>
+        )}
+      </div>
     </>
   );
 }
