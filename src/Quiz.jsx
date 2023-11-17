@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { decode } from 'html-entities';
@@ -11,7 +11,15 @@ export default function Quiz() {
   console.log(categoryNumber);
   const id = categoryNumber;
 
+  // send user the home page after submit btn
+  const navigate = useNavigate();
+
   const [userAnswers, setUserAnswers] = useState([]);
+  // condition to render score after submit
+  const [quizChecked, setQuizChecked] = useState(false);
+
+  // user score
+  const [userScore, setUserScore] = useState(0);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['questions'],
@@ -85,12 +93,16 @@ export default function Quiz() {
   function handleSubmit() {
     let score = 0;
     userAnswers.forEach((ans, index) => {
-      if (ans === shuffledQuestions[index].correct_answer) {
-        score++;
+      if (ans?.answer === shuffledQuestions[index].correct_answer) {
+        setUserScore(prev => prev + 1);
       }
     });
+    setQuizChecked(true);
+  }
 
-    return console.log(`your score ${score}`);
+  function sendUserToHomePage() {
+    navigate('/');
+    setQuizChecked(true);
   }
 
   const questionsEl = shuffledQuestions.map((qsn, i) => (
@@ -102,6 +114,8 @@ export default function Quiz() {
             className={`w-full max-w-[180px] py-2  relative border border-sky-100 rounded ${
               userAnswers[i]?.answer === ans
                 ? 'bg-[#D6DBF5] text-[#293264]'
+                : quizChecked && userAnswers[i]?.correct_answer === ans
+                ? 'bg-green-500'
                 : ''
             }`}
             htmlFor={`q${i}a${index}`}
@@ -114,6 +128,7 @@ export default function Quiz() {
               name={`q${i}`}
               value={ans}
               id={`q${i}a${index}`}
+              disabled={quizChecked}
             />
             {ans}
           </label>
@@ -136,7 +151,26 @@ export default function Quiz() {
         ) : (
           <div>
             {questionsEl}
-            <button onClick={handleSubmit}>submit</button>
+            <div className="text-center">
+              {quizChecked ? (
+                <button
+                  className="bg-black rounded w-full max-w-[200px] my-5 mx-auto py-3 "
+                  onClick={sendUserToHomePage}
+                >
+                  Return Home Page
+                </button>
+              ) : (
+                <button
+                  className="bg-black rounded w-full max-w-[200px] my-5 mx-auto py-3 "
+                  onClick={handleSubmit}
+                >
+                  Check Answers
+                </button>
+              )}
+              <div>
+                <p>Your Score {`${shuffledQuestions.length} / ${userScore}`}</p>
+              </div>
+            </div>
           </div>
         )}
       </div>
