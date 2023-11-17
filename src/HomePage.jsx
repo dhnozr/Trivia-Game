@@ -61,7 +61,7 @@ export default function HomePage() {
               </option>
             ))}
           </select>
-          <button className="text-xl border border-cyan-200 p-2 rounded max-w-[200px] w-full hover:bg-yellow-400 transition-all hover:text-slate-900 hover:font-bold">
+          <button className="text-xl border border-cyan-200 p-2 rounded max-w-[200px] w-full hover:bg-yellow-400 transition-all hover:text-slate-900">
             Submit
           </button>
         </form>
