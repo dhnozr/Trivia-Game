@@ -45,7 +45,10 @@ export default function HomePage() {
           <h2>Error accured: {error.message}</h2>
         </div>
       ) : (
-        <form className="text-white flex items-center justify-center gap-6 flex-wrap max-w-lg">
+        <form
+          onSubmit={onSubmit}
+          className="text-white flex items-center justify-center gap-6 flex-wrap max-w-lg"
+        >
           <label className="text-xl" htmlFor="category">
             Choose a Category
           </label>
