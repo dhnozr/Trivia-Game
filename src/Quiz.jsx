@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { decode } from 'html-entities';
+import animationData from './assets/Animation - 1700253930376.json';
 
 export default function Quiz() {
   const location = useLocation();
@@ -21,16 +22,23 @@ export default function Quiz() {
   // user score
   const [userScore, setUserScore] = useState(0);
 
+  const wait = ms => new Promise(reselvo => setTimeout(reselvo, ms));
   const { data, isLoading, error } = useQuery({
-    queryKey: ['questions'],
-
+    queryKey: ['questions', [id]],
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+    retryDelay: 5000,
     queryFn: async () => {
+      await wait(2000);
+
       const { data } = await axios.get(
         `https://opentdb.com/api.php?amount=10&category=${id}&difficulty=easy&type=multiple`
       );
       return data.results;
     },
   });
+
+  console.log(data);
 
   const [shuffledQuestions, setShuffledQuestions] = useState([]);
 
@@ -88,10 +96,7 @@ export default function Quiz() {
     setUserAnswers(answers);
   }
 
-  console.log(userAnswers);
-
   function handleSubmit() {
-    let score = 0;
     userAnswers.forEach((ans, index) => {
       if (ans?.answer === shuffledQuestions[index].correct_answer) {
         setUserScore(prev => prev + 1);
@@ -106,16 +111,19 @@ export default function Quiz() {
   }
 
   const questionsEl = shuffledQuestions.map((qsn, i) => (
-    <div className="text-center flex flex-col gap-4">
+    <div key={i} className="text-center flex flex-col gap-4">
       <h2 className="text-lg font-bold mt-10 ">{qsn.question}</h2>
       <div className="flex flex-wrap items-center justify-center gap-6">
         {qsn.all_answers.map((ans, index) => (
           <label
+            key={index}
             className={`w-full max-w-[180px] py-2  relative border border-sky-100 rounded ${
-              userAnswers[i]?.answer === ans
+              quizChecked && ans !== userAnswers[i]?.correct_answer
+                ? 'bg-red-500'
+                : quizChecked && ans === userAnswers[i]?.correct_answer
+                ? 'bg-red-500'
+                : userAnswers[i]?.answer === ans
                 ? 'bg-[#D6DBF5] text-[#293264]'
-                : quizChecked && userAnswers[i]?.correct_answer === ans
-                ? 'bg-green-500'
                 : ''
             }`}
             htmlFor={`q${i}a${index}`}
@@ -137,6 +145,10 @@ export default function Quiz() {
     </div>
   ));
 
+  if (questionsEl === 0) {
+    error;
+  }
+
   return (
     <>
       <div className="min-h-screen bg-[url('/layered-waves-haikei.svg')] bg-no-repeat bg-cover text-[#DEEBF8] flex flex-col font-Inter">
@@ -151,6 +163,7 @@ export default function Quiz() {
         ) : (
           <div>
             {questionsEl}
+
             <div className="text-center">
               {quizChecked ? (
                 <button
