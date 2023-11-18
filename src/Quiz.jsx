@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { decode } from 'html-entities';
 import animationData from './assets/Animation - 1700253930376.json';
+import Lottie from 'lottie-react';
 
 export default function Quiz() {
   const location = useLocation();
@@ -153,8 +154,8 @@ export default function Quiz() {
     <>
       <div className="min-h-screen bg-[url('/layered-waves-haikei.svg')] bg-no-repeat bg-cover text-[#DEEBF8] flex flex-col font-Inter">
         {isLoading ? (
-          <div>
-            <h2>...Loading</h2>
+          <div className="flex items-center justify-center">
+            <Lottie animationData={animationData} />
           </div>
         ) : error ? (
           <div>
