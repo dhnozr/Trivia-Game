@@ -29,7 +29,9 @@ export default function HomePage() {
     const selectedIndex = e.target.selectedIndex;
 
     const value = e.target[selectedIndex].value;
-    setCategoryNumber(value);
+    const categoryValue = Number(value);
+    console.log(typeof categoryValue);
+    setCategoryNumber(categoryValue);
   };
 
   console.log(categoryNumber);
