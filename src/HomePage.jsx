@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import React, { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import animationData from './assets/Animation - 1700253930376.json';
 import Lottie from 'lottie-react';
 
@@ -10,12 +12,15 @@ export default function HomePage() {
   const navigate = useNavigate();
   const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+  const queryClient = useQueryClient();
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['categories'],
     retryDelay: 5000,
     refetchOnMount: true,
+    staleTime: 3000,
     queryFn: async () => {
-      await wait(2000);
+      await wait(3000);
       const { data } = await axios.get('https://opentdb.com/api_category.php');
       return data.trivia_categories;
     },
@@ -27,6 +32,7 @@ export default function HomePage() {
   const onSubmit = e => {
     e.preventDefault();
     navigate('/quiz', { state: categoryNumber });
+    queryClient.removeQueries(['categories']);
   };
 
   const handleChange = e => {
@@ -71,7 +77,7 @@ export default function HomePage() {
             ))}
           </select>
           <button className="text-xl border border-cyan-200 p-2 rounded max-w-[200px] w-full hover:bg-yellow-400 transition-all hover:text-slate-900">
-            Submit
+            Start Quiz
           </button>
         </form>
       )}
