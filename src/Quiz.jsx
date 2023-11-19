@@ -44,7 +44,7 @@ export default function Quiz() {
   const [shuffledQuestions, setShuffledQuestions] = useState([]);
 
   useEffect(() => {
-    if (data) {
+    if (data && data.length > 0) {
       const shuffledData = data.map(el => ({
         category: decode(el.category),
         correct_answer: decode(el.correct_answer),
@@ -60,18 +60,19 @@ export default function Quiz() {
     }
   }, [data]);
 
-  /*  const questions = [];
-  {
-    data?.map(el => {
-      questions.push({
-        category: decode(el.category),
-        correct_answer: decode(el.correct_answer),
-        difficulty: decode(el.difficulty),
-        all_answers: shuffleArray([...el.incorrect_answers, el.correct_answer]),
-        question: decode(el.question),
-      });
-    });
-  } */
+  if (data?.length <= 0) {
+    return (
+      <div className="h-screen bg-[url('/layered-waves-haikei.svg')] bg-no-repeat bg-cover text-[#DEEBF8] flex flex-col gap-4 items-center justify-center ">
+        <h2 className="text-2xl">No questions available at the moment.</h2>
+        <button
+          className="bg-black rounded w-full max-w-[200px] my-5 mx-auto py-3"
+          onClick={sendUserToHomePage}
+        >
+          Return Home
+        </button>
+      </div>
+    );
+  }
 
   function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -119,12 +120,10 @@ export default function Quiz() {
           <label
             key={index}
             className={`w-full max-w-[180px] py-2  relative border border-sky-100 rounded ${
-              quizChecked && ans !== userAnswers[i]?.correct_answer
-                ? 'bg-red-500'
-                : quizChecked && ans === userAnswers[i]?.correct_answer
-                ? 'bg-red-500'
-                : userAnswers[i]?.answer === ans
+              userAnswers[i]?.answer === ans
                 ? 'bg-[#D6DBF5] text-[#293264]'
+                : quizChecked && userAnswers[i]?.correct_answer === ans
+                ? 'bg-green-500'
                 : ''
             }`}
             htmlFor={`q${i}a${index}`}
