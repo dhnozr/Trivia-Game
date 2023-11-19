@@ -3,6 +3,8 @@ import axios from 'axios';
 import React, { useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
+import animationData from './assets/Animation - 1700253930376.json';
+import Lottie from 'lottie-react';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -10,6 +12,8 @@ export default function HomePage() {
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['categories'],
+    retryDelay: 5000,
+    refetchOnMount: true,
     queryFn: async () => {
       await wait(2000);
       const { data } = await axios.get('https://opentdb.com/api_category.php');
@@ -40,7 +44,7 @@ export default function HomePage() {
     <div className="h-screen  bg-[url('/blob-scene-haikei.svg')] bg-no-repeat bg-cover flex items-center justify-center flex-col text-white">
       {isLoading ? (
         <div>
-          <h2 className="texy-4xl">...Loading</h2>
+          <Lottie animationData={animationData} />
         </div>
       ) : error ? (
         <div>
