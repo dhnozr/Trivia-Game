@@ -6,13 +6,13 @@ The application is built using React and leverages the @tanstack/react-query for
 
 The HomePage component is responsible for displaying the list of trivia categories fetched from the Open Trivia Database API. Users can select a category and start the quiz. The page uses Lottie animations for better user engagement.
 
-![homepage](\Screenshot-163558.png)
+![homepage](/public/Screenshot-163558.png)
 
 # Quiz
 
 The Quiz component handles the quiz functionality. It fetches trivia questions based on the selected category and presents them to the user. Users can select answers and submit them to see their scores. The component also handles various states like loading, error, and quiz completion.
 
-![quiz page](\Screenshot-163823.png)
+![quizpage](/public/Screenshot-163823.png)
 
 # Live Site
 
