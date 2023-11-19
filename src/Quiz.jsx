@@ -113,7 +113,7 @@ export default function Quiz() {
   }
 
   const questionsEl = shuffledQuestions.map((qsn, i) => (
-    <div key={i} className="text-center flex flex-col gap-4">
+    <div key={i} className="text-center flex flex-col gap-4 px-2">
       <h2 className="text-lg font-bold mt-10 ">{qsn.question}</h2>
       <div className="flex flex-wrap items-center justify-center gap-6">
         {qsn.all_answers.map((ans, index) => (
@@ -145,15 +145,11 @@ export default function Quiz() {
     </div>
   ));
 
-  if (questionsEl === 0) {
-    error;
-  }
-
   return (
     <>
       <div className="min-h-screen bg-[url('/layered-waves-haikei.svg')] bg-no-repeat bg-cover text-[#DEEBF8] flex flex-col font-Inter">
         {isLoading ? (
-          <div className="flex items-center justify-center">
+          <div className="flex h-screen items-center justify-center">
             <Lottie animationData={animationData} />
           </div>
         ) : error ? (
@@ -166,23 +162,27 @@ export default function Quiz() {
 
             <div className="text-center">
               {quizChecked ? (
-                <button
-                  className="bg-black rounded w-full max-w-[200px] my-5 mx-auto py-3 "
-                  onClick={sendUserToHomePage}
-                >
-                  Return Home Page
-                </button>
+                <div className="flex items-center justify-center gap-4">
+                  <button
+                    className="bg-black rounded w-full max-w-[200px] my-5 py-3 "
+                    onClick={sendUserToHomePage}
+                  >
+                    Return Home Page
+                  </button>
+                  <p>
+                    Your score {userScore} / {shuffledQuestions.length}
+                  </p>
+                </div>
               ) : (
-                <button
-                  className="bg-black rounded w-full max-w-[200px] my-5 mx-auto py-3 "
-                  onClick={handleSubmit}
-                >
-                  Check Answers
-                </button>
+                <div>
+                  <button
+                    className="bg-black rounded w-full max-w-[200px] my-5 mx-auto py-3 "
+                    onClick={handleSubmit}
+                  >
+                    Check Answers
+                  </button>
+                </div>
               )}
-              <div>
-                <p>Your Score {`${shuffledQuestions.length} / ${userScore}`}</p>
-              </div>
             </div>
           </div>
         )}
