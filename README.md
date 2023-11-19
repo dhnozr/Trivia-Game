@@ -14,6 +14,10 @@ The Quiz component handles the quiz functionality. It fetches trivia questions b
 
 ![public\Screenshot-163823.png]
 
+# Live Site
+
+[appsite](https://quiz-game-dhnozr.netlify.app/)
+
 # Technologies Used
 
 1. React
